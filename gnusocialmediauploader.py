@@ -4,12 +4,16 @@ import pathlib
 import random
 import logging
 import getpass
+import sys
 
 import gnusocial as gs
 import gnusocial.media
 import gnusocial.statuses
 
-SERVER_URL = 'https://gs.smuglo.li'
+
+logging.basicConfig(level=logging.DEBUG)
+
+SERVER_URL = 'https://shitposter.club'
 USERNAME = 'cow2001'
 PASSWORD = ''
 
@@ -42,19 +46,19 @@ def move_image(image_path,
     image_path.rename(sink_image_directory.joinpath(image_path.name))
 
 
-def update_status(image_absolute_path,
+def update_status(#image_absolute_path,
                   server_url,
                   status,
                   username,
                   password,
+                  media_ids
 ):
-    with image_absolute_path.open('rb') as image_file:
-        result = gs.statuses.update(server_url=server_url,
-                                    username=username,
-                                    password=password,
-                                    status=status,
-                                    media=image_file,
-        )
+    result = gs.statuses.update(server_url=server_url,
+                                username=username,
+                                password=password,
+                                status=status,
+                                media_ids=media_ids,
+    )
     return result
 
 
@@ -66,12 +70,24 @@ def main(server_url,
          status,
 ):
     random_image_absolute_path = get_random_image_path(source_image_directory)
-    status_dict = update_status(random_image_absolute_path,
-                                server_url=server_url,
-                                status=status,
-                                username=username,
-                                password=password,
+    upload_response = upload_image(image_absolute_path=random_image_absolute_path,
+                                   server_url=server_url,
+                                   username=username,
+                                   password=password,
     )
+    
+    media_ids = [upload_response['media_id']]
+
+    update_status_response = update_status(
+        server_url=server_url,
+        status=status,
+        username=username,
+        password=password,
+        media_ids=media_ids,
+    )
+    
+    logging.debug(str(update_status_response))
+    
     move_image(random_image_absolute_path,
                sink_image_directory=sink_image_directory)
 
