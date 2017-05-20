@@ -1,0 +1,10 @@
+[dev-packages]
+elpy = "*"
+importmagic = "*"
+autopep8 = "*"
+yapf = "*"
+flake8 = "*"
+
+[packages.gnusocial]
+git = "https://github.com/yuvallanger/pygnusocial.git"
+ref = "media_ids"
